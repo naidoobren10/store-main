@@ -23,8 +23,9 @@ public class OrderController {
    }
 
     @GetMapping
-    public List<OrderDTO> getAllOrders() {
-        return orderService.getAllOrders();
+    public ResponseEntity<List<OrderDTO>> getAllOrders() {
+       List<OrderDTO> orders = orderService.getAllOrders();
+       return ResponseEntity.status(HttpStatus.OK).body(orders);
     }
 
     @PostMapping
