@@ -17,6 +17,7 @@ import java.util.List;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -90,10 +91,28 @@ class CustomerControllerTests {
 
     @Test
     void  testGetAllCustomers() throws Exception {
-        when(customerService.findAllCustomers()).thenReturn(List.of(customerDTO));
+        when(customerService.findCustomers(null)).thenReturn(List.of(customerDTO));
 
         mockMvc.perform(get("/customer"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..name").value("John Doe"));
+    }
+
+    @Test
+    void testGetCustomersByQueryString() throws Exception {
+        when(customerService.findCustomers("Jo")).thenReturn(List.of(customerDTO));
+
+        mockMvc.perform(get("/customer").param("queryString", "Jo"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].name").value("John Doe"));
+    }
+
+    @Test
+    void testGetCustomersByQueryStringWhenNoMatches() throws Exception {
+        when(customerService.findCustomers("Missing")).thenReturn(List.of());
+
+        mockMvc.perform(get("/customer").param("queryString", "Missing"))
+                .andExpect(status().isOk())
+                .andExpect(content().json("[]"));
     }
 }

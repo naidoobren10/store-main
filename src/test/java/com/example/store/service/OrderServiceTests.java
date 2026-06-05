@@ -6,6 +6,7 @@ import com.example.store.dto.OrderRequestDTO;
 import com.example.store.entity.Customer;
 import com.example.store.entity.Order;
 import com.example.store.error.CustomerNotFoundException;
+import com.example.store.error.OrderNotFoundException;
 import com.example.store.mapper.OrderMapper;
 import com.example.store.repository.CustomerRepository;
 import com.example.store.repository.OrderRepository;
@@ -113,5 +114,28 @@ class OrderServiceTests {
         List<OrderDTO> result = orderService.getAllOrders();
 
         assertSame(orderDTOs, result);
+    }
+
+    @Test
+    void getOrderByIdReturnsOrder() {
+        Order order = savedOrder;
+
+        when(orderRepository.findById(10L)).thenReturn(Optional.of(order));
+        when(orderMapper.orderToOrderDTO(order)).thenReturn(orderDTO);
+
+        OrderDTO result = orderService.getOrderByID(orderDTO.getId());
+        assertSame(orderDTO, result);
+    }
+
+    @Test
+    void getOrderByIdThrowsWhenOrderDoesNotExist() {
+        when(orderRepository.findById(1L)).thenReturn(Optional.empty());
+
+        OrderNotFoundException exception = assertThrows(
+                OrderNotFoundException.class,
+                () -> orderService.getOrderByID(1L));
+
+        assertEquals("Order not found: 1", exception.getMessage());
+        verify(orderRepository).findById(1L);
     }
 }

@@ -3,5 +3,18 @@ package com.example.store.repository;
 import com.example.store.entity.Customer;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
-public interface CustomerRepository extends JpaRepository<Customer, Long> {}
+import java.util.List;
+
+
+public interface CustomerRepository extends JpaRepository<Customer, Long> {
+
+    @Query(value = """
+    select *
+    from customer c
+    where lower(c.name) ~ :pattern
+    """, nativeQuery = true)
+    List<Customer> findByNameContainingQueryString(@Param("pattern") String pattern);
+}
