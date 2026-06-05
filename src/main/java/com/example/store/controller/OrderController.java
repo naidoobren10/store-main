@@ -34,5 +34,11 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.CREATED).body(orderDTO);
     }
 
+    @GetMapping("/{orderId}")
+    public ResponseEntity<OrderDTO> getOrderByID( @PathVariable Long orderId) {
+        OrderDTO orderDTO = orderService.getOrderByID(orderId);
+        return ResponseEntity.status(HttpStatus.OK).body(orderDTO);
+    }
+
 
 }

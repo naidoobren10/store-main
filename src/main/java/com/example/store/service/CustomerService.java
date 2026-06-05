@@ -5,7 +5,6 @@ import com.example.store.dto.CustomerDTO;
 import com.example.store.entity.Customer;
 import com.example.store.mapper.CustomerMapper;
 import com.example.store.repository.CustomerRepository;
-import com.example.store.repository.OrderRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,8 +27,15 @@ public class CustomerService {
         return customerMapper.customerToCustomerDTO(customerRepository.save(customer));
     }
 
-     public List<CustomerDTO> findAllCustomers() {
-        List<Customer> customers = customerRepository.findAll();
+    public List<CustomerDTO> findCustomers(String nameSearchQueryString) {
+        List<Customer> customers;
+
+        if (nameSearchQueryString == null || nameSearchQueryString.isBlank()) {
+            customers = customerRepository.findAll();
+        } else {
+            customers = customerRepository.findByNameContainingIgnoreCase(nameSearchQueryString);
+        }
+
         return customerMapper.customersToCustomerDTOs(customers);
-     }
+    }
 }

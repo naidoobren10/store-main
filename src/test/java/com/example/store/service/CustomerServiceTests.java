@@ -5,7 +5,6 @@ import com.example.store.dto.CustomerDTO;
 import com.example.store.entity.Customer;
 import com.example.store.mapper.CustomerMapper;
 import com.example.store.repository.CustomerRepository;
-import com.example.store.repository.OrderRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -27,9 +27,6 @@ class CustomerServiceTests {
 
     @Mock
     private CustomerRepository customerRepository;
-
-    @Mock
-    private OrderRepository orderRepository;
 
     @Mock
     private CustomerMapper customerMapper;
@@ -71,14 +68,52 @@ class CustomerServiceTests {
     }
 
     @Test
-    void findAllCustomersReturnsMappedCustomers() {
+    void findCustomersReturnsMappedCustomers() {
         List<Customer> customers = List.of(customer);
         List<CustomerDTO> customerDTOs = List.of(customerDTO);
 
         when(customerRepository.findAll()).thenReturn(customers);
         when(customerMapper.customersToCustomerDTOs(customers)).thenReturn(customerDTOs);
 
-        List<CustomerDTO> result = customerService.findAllCustomers();
+        List<CustomerDTO> result = customerService.findCustomers("");
+
+        assertSame(customerDTOs, result);
+    }
+
+    @Test
+    void findCustomerByNameSearch() {
+        List<Customer> customers = new ArrayList<>();
+        Customer newCustomer = new Customer();
+        newCustomer.setId(2L);
+        newCustomer.setName("Joe Doe");
+        customers.add(customer);
+        customers.add(newCustomer);
+
+        List<CustomerDTO> customerDTOs = new ArrayList<>();
+        CustomerDTO newCustomerDTO = new CustomerDTO();
+        newCustomerDTO.setName(newCustomer.getName());
+        newCustomerDTO.setId(newCustomer.getId());
+        customerDTOs.add(customerDTO);
+        customerDTOs.add(newCustomerDTO);
+
+
+        when(customerRepository.findByNameContainingIgnoreCase("Jo")).thenReturn(customers);
+        when(customerMapper.customersToCustomerDTOs(customers)).thenReturn(customerDTOs);
+
+        List<CustomerDTO> result = customerService.findCustomers("Jo");
+
+        assertSame(customerDTOs, result);
+    }
+
+    @Test
+    void findCustomersReturnsEmptyListWhenSearchHasNoMatches() {
+        List<Customer> customers = List.of();
+        List<CustomerDTO> customerDTOs = List.of();
+
+        when(customerRepository.findByNameContainingIgnoreCase("Missing")).thenReturn(customers);
+        when(customerMapper.customersToCustomerDTOs(customers)).thenReturn(customerDTOs);
+
+        List<CustomerDTO> result = customerService.findCustomers("Missing");
 
         assertSame(customerDTOs, result);
     }

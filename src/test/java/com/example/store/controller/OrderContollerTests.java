@@ -5,9 +5,7 @@ import com.example.store.dto.OrderCustomerDTO;
 import com.example.store.dto.OrderDTO;
 import com.example.store.dto.OrderRequestDTO;
 import com.example.store.error.CustomerNotFoundException;
-import com.example.store.mapper.CustomerMapper;
-import com.example.store.repository.CustomerRepository;
-import com.example.store.repository.OrderRepository;
+import com.example.store.error.OrderNotFoundException;
 import com.example.store.service.OrderService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -142,13 +140,23 @@ class OrderControllerTests {
                 .andExpect(jsonPath("$..customer.name").value("John Doe"));
     }
 
-   /* @Test
+   @Test
     void testGetOrderById() throws Exception {
-        when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
+        when(orderService.getOrderByID(1L)).thenReturn(orderDTO);
 
         mockMvc.perform(get("/order/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.description").value("Test Order"))
                 .andExpect(jsonPath("$.customer.name").value("John Doe"));
-    }*/
+    }
+
+    @Test
+    void testGetOrderByIdWhenOrderNotFound() throws Exception {
+        when(orderService.getOrderByID(1L)).thenThrow(new OrderNotFoundException("Order not found: 1"));
+
+        mockMvc.perform(get("/order/1"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.title").value("Order not found"))
+                .andExpect(jsonPath("$.detail").value("The order could not be found."));
+    }
 }

@@ -5,6 +5,7 @@ import com.example.store.dto.OrderRequestDTO;
 import com.example.store.entity.Customer;
 import com.example.store.entity.Order;
 import com.example.store.error.CustomerNotFoundException;
+import com.example.store.error.OrderNotFoundException;
 import com.example.store.mapper.OrderMapper;
 import com.example.store.repository.CustomerRepository;
 import com.example.store.repository.OrderRepository;
@@ -40,5 +41,11 @@ public class OrderService {
 
 
         return orderMapper.orderToOrderDTO(orderRepository.save(order));
+    }
+
+    public OrderDTO getOrderByID(Long id) {
+        return orderMapper.orderToOrderDTO(orderRepository
+                .findById(id)
+                .orElseThrow(() -> new OrderNotFoundException("Order not found: " + id)));
     }
 }

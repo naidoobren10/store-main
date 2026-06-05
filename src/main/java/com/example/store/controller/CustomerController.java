@@ -21,8 +21,10 @@ public class CustomerController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CustomerDTO>> getAllCustomers() {
-        List<CustomerDTO> customerDTOList = customerService.findAllCustomers();
+    public ResponseEntity<List<CustomerDTO>> getAllCustomers(
+            @RequestParam(required = false) String queryString
+    ) {
+        List<CustomerDTO> customerDTOList = customerService.findCustomers(queryString);
         return ResponseEntity.status(HttpStatus.OK).body(customerDTOList);
     }
 
