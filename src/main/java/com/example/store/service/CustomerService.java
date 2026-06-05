@@ -7,7 +7,10 @@ import com.example.store.mapper.CustomerMapper;
 import com.example.store.repository.CustomerRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 public class CustomerService {
@@ -33,9 +36,21 @@ public class CustomerService {
         if (nameSearchQueryString == null || nameSearchQueryString.isBlank()) {
             customers = customerRepository.findAll();
         } else {
-            customers = customerRepository.findByNameContainingIgnoreCase(nameSearchQueryString);
+            String queryStringPattern = generateQueryStringSearchPattern(nameSearchQueryString.trim());
+            customers = customerRepository.findByNameContainingQueryString(queryStringPattern);
         }
 
         return customerMapper.customersToCustomerDTOs(customers);
+    }
+
+    private String generateQueryStringSearchPattern(String queryString) {
+        String [] parts = queryString.toLowerCase().split("\\s+");
+
+        return  "^" +
+                Arrays.stream(parts)
+                        .map(part -> Pattern.quote(part))
+                        .map(part -> part + "[^[:space:]]*")
+                        .collect(Collectors.joining("\\s+")) +
+                "(\\s+.*)?$";
     }
 }

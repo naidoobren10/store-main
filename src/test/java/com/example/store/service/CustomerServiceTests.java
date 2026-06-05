@@ -96,13 +96,15 @@ class CustomerServiceTests {
         customerDTOs.add(customerDTO);
         customerDTOs.add(newCustomerDTO);
 
+        String pattern = "^\\Qjo\\E[^[:space:]]*(\\s+.*)?$";
 
-        when(customerRepository.findByNameContainingIgnoreCase("Jo")).thenReturn(customers);
+        when(customerRepository.findByNameContainingQueryString(pattern)).thenReturn(customers);
         when(customerMapper.customersToCustomerDTOs(customers)).thenReturn(customerDTOs);
 
         List<CustomerDTO> result = customerService.findCustomers("Jo");
 
         assertSame(customerDTOs, result);
+        verify(customerRepository).findByNameContainingQueryString(pattern);
     }
 
     @Test
@@ -110,11 +112,14 @@ class CustomerServiceTests {
         List<Customer> customers = List.of();
         List<CustomerDTO> customerDTOs = List.of();
 
-        when(customerRepository.findByNameContainingIgnoreCase("Missing")).thenReturn(customers);
+        String pattern = "^\\Qmissing\\E[^[:space:]]*(\\s+.*)?$";
+
+        when(customerRepository.findByNameContainingQueryString(pattern)).thenReturn(customers);
         when(customerMapper.customersToCustomerDTOs(customers)).thenReturn(customerDTOs);
 
         List<CustomerDTO> result = customerService.findCustomers("Missing");
 
         assertSame(customerDTOs, result);
+        verify(customerRepository).findByNameContainingQueryString(pattern);
     }
 }
