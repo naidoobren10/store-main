@@ -1,7 +1,7 @@
 package com.example.store.repository;
 
-import com.example.store.entity.Order;
 
+import com.example.store.entity.Product;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.lang.NonNull;
@@ -9,15 +9,15 @@ import org.springframework.lang.NonNull;
 import java.util.List;
 import java.util.Optional;
 
-public interface OrderRepository extends JpaRepository<Order, Long> {
-    @Override
-    @NonNull
-    @EntityGraph(attributePaths = {"customer", "products"})
-    List<Order> findAll();
+public interface ProductRepository extends JpaRepository<Product, Long> {
 
     @Override
     @NonNull
-    @EntityGraph(attributePaths = {"customer", "products"})
-    Optional<Order> findById(@NonNull Long id);
+    @EntityGraph(attributePaths = {"orders"})
+    List<Product> findAll();
 
+    @Override
+    @NonNull
+    @EntityGraph(attributePaths = {"orders"})
+    Optional<Product> findById(@NonNull Long id);
 }

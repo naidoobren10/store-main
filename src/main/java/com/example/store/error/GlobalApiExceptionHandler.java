@@ -69,4 +69,14 @@ public class GlobalApiExceptionHandler {
         problemDetail.setDetail("The order could not be found.");
         return problemDetail;
     }
+
+    @ExceptionHandler(ProductNotFoundException.class)
+    ProblemDetail handleUnexpected(ProductNotFoundException exception) {
+        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
+        problemDetail.setTitle("Product not found");
+        problemDetail.setDetail("One or more products could not be found.".equals(exception.getMessage())
+                ? exception.getMessage()
+                : "The product could not be found.");
+        return problemDetail;
+    }
 }

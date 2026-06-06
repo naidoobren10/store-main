@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -48,9 +47,13 @@ public class CustomerService {
 
         return  "^" +
                 Arrays.stream(parts)
-                        .map(part -> Pattern.quote(part))
+                        .map(this::escapePostgresRegexLiteral)
                         .map(part -> part + "[^[:space:]]*")
                         .collect(Collectors.joining("\\s+")) +
                 "(\\s+.*)?$";
+    }
+
+    private String escapePostgresRegexLiteral(String value) {
+        return value.replaceAll("([\\\\.^$|?*+()\[\]{}])", "\\\\$1");
     }
 }

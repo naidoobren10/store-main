@@ -96,7 +96,7 @@ class CustomerServiceTests {
         customerDTOs.add(customerDTO);
         customerDTOs.add(newCustomerDTO);
 
-        String pattern = "^\\Qjo\\E[^[:space:]]*(\\s+.*)?$";
+        String pattern = "^jo[^[:space:]]*(\\s+.*)?$";
 
         when(customerRepository.findByNameContainingQueryString(pattern)).thenReturn(customers);
         when(customerMapper.customersToCustomerDTOs(customers)).thenReturn(customerDTOs);
@@ -112,7 +112,7 @@ class CustomerServiceTests {
         List<Customer> customers = List.of();
         List<CustomerDTO> customerDTOs = List.of();
 
-        String pattern = "^\\Qmissing\\E[^[:space:]]*(\\s+.*)?$";
+        String pattern = "^missing[^[:space:]]*(\\s+.*)?$";
 
         when(customerRepository.findByNameContainingQueryString(pattern)).thenReturn(customers);
         when(customerMapper.customersToCustomerDTOs(customers)).thenReturn(customerDTOs);

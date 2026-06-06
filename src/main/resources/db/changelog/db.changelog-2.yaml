@@ -5,3 +5,20 @@ databaseChangeLog:
       changes:
         - sqlFile:
             path: db/changelog/data.sql
+  - changeSet:
+      id: 2-product-data
+      author: developer@securitease.com
+      preConditions:
+        - onFail: MARK_RAN
+        - sqlCheck:
+            expectedResult: 0
+            sql: SELECT COUNT(*) FROM "product" WHERE description IN ('Milk', 'Bread', 'Eggs', 'Apples', 'Rice')
+      changes:
+        - sqlFile:
+            path: db/changelog/product-data.sql
+  - changeSet:
+      id: 2-sync-id-sequences
+      author: developer@securitease.com
+      changes:
+        - sqlFile:
+            path: db/changelog/sync-id-sequences.sql
