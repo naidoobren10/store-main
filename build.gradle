@@ -65,6 +65,25 @@ tasks.named('processResources') {
     }
 }
 
+tasks.named('bootBuildImage') {
+    imageName = System.getenv('IMAGE_NAME') ?: "ghcr.io/${project.name}:${project.version}"
+
+    def latestTag = System.getenv('IMAGE_LATEST_TAG')
+    if (latestTag) {
+        tags = [latestTag]
+    }
+
+    publish = System.getenv('REGISTRY_USERNAME') != null && System.getenv('REGISTRY_PASSWORD') != null
+
+    docker {
+        publishRegistry {
+            url = 'ghcr.io'
+            username = System.getenv('REGISTRY_USERNAME')
+            password = System.getenv('REGISTRY_PASSWORD')
+        }
+    }
+}
+
 tasks.named('test') {
     useJUnitPlatform()
     finalizedBy tasks.jacocoTestReport

@@ -14,6 +14,9 @@ import com.example.store.mapper.OrderMapper;
 import com.example.store.repository.CustomerRepository;
 import com.example.store.repository.OrderRepository;
 import com.example.store.repository.ProductRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -152,14 +155,15 @@ class OrderServiceTests {
     @Test
     void getAllOrdersReturnsMappedOrders() {
         List<Order> orders = List.of(savedOrder);
-        List<OrderDTO> orderDTOs = List.of(orderDTO);
+        Page<Order> orderPage = new PageImpl<>(orders);
+        PageRequest pageRequest = PageRequest.of(0, 50);
 
-        when(orderRepository.findAll()).thenReturn(orders);
-        when(orderMapper.ordersToOrderDTOs(orders)).thenReturn(orderDTOs);
+        when(orderRepository.findAll(pageRequest)).thenReturn(orderPage);
+        when(orderMapper.orderToOrderDTO(savedOrder)).thenReturn(orderDTO);
 
-        List<OrderDTO> result = orderService.getAllOrders();
+        Page<OrderDTO> result = orderService.getAllOrders(pageRequest);
 
-        assertSame(orderDTOs, result);
+        assertEquals(List.of(orderDTO), result.getContent());
     }
 
     @Test

@@ -108,6 +108,22 @@ class CustomerServiceTests {
     }
 
     @Test
+    void findCustomerByNameSearchEscapesRegexCharactersForPostgres() {
+        List<Customer> customers = List.of(customer);
+        List<CustomerDTO> customerDTOs = List.of(customerDTO);
+
+        String pattern = "^jo\\+[^[:space:]]*(\\s+.*)?$";
+
+        when(customerRepository.findByNameContainingQueryString(pattern)).thenReturn(customers);
+        when(customerMapper.customersToCustomerDTOs(customers)).thenReturn(customerDTOs);
+
+        List<CustomerDTO> result = customerService.findCustomers("Jo+");
+
+        assertSame(customerDTOs, result);
+        verify(customerRepository).findByNameContainingQueryString(pattern);
+    }
+
+    @Test
     void findCustomersReturnsEmptyListWhenSearchHasNoMatches() {
         List<Customer> customers = List.of();
         List<CustomerDTO> customerDTOs = List.of();

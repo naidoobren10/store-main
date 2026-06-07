@@ -60,7 +60,7 @@ class CustomerRepositoryIntegrationTests {
     @Test
     void findByNameContainingQueryStringMatchesOrderedWordPrefixes() {
         List<Customer> results = customerRepository.findByNameContainingQueryString(
-                "^\\Qjo\\E[^[:space:]]*\\s+\\Qd\\E[^[:space:]]*(\\s+.*)?$");
+                "^jo[^[:space:]]*\\s+d[^[:space:]]*(\\s+.*)?$");
 
         assertEquals(List.of("Joe Doe", "John Deer"), results.stream().map(Customer::getName).sorted().toList());
     }
@@ -68,7 +68,7 @@ class CustomerRepositoryIntegrationTests {
     @Test
     void findByNameContainingQueryStringReturnsEmptyListWhenNothingMatches() {
         List<Customer> results = customerRepository.findByNameContainingQueryString(
-                "^\\Qxx\\E[^[:space:]]*(\\s+.*)?$");
+                "^xx[^[:space:]]*(\\s+.*)?$");
 
         assertTrue(results.isEmpty());
     }
@@ -76,9 +76,9 @@ class CustomerRepositoryIntegrationTests {
     @Test
     void findByNameContainingQueryStringSupportsPunctuationInsideNameWords() {
         List<Customer> hyphenResults = customerRepository.findByNameContainingQueryString(
-                "^\\Qanne-m\\E[^[:space:]]*(\\s+.*)?$");
+                "^anne-m[^[:space:]]*(\\s+.*)?$");
         List<Customer> apostropheResults = customerRepository.findByNameContainingQueryString(
-                "^\\Qo'c\\E[^[:space:]]*(\\s+.*)?$");
+                "^o'c[^[:space:]]*(\\s+.*)?$");
 
         assertEquals(List.of("Anne-Marie Jones"), hyphenResults.stream().map(Customer::getName).toList());
         assertEquals(List.of("O'Connor Shaun"), apostropheResults.stream().map(Customer::getName).toList());
