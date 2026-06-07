@@ -5,3 +5,16 @@ databaseChangeLog:
       changes:
         - sqlFile:
             path: db/changelog/schema.sql
+  - changeSet:
+      id: 1-product-schema-updates
+      author: developer@securitease.com
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: product
+      changes:
+        - sqlFile:
+            path: db/changelog/product-schema.sql
+        - sqlFile:
+            path: db/changelog/order-product-schema.sql

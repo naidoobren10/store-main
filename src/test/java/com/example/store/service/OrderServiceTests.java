@@ -2,14 +2,21 @@ package com.example.store.service;
 
 import com.example.store.dto.OrderCustomerDTO;
 import com.example.store.dto.OrderDTO;
+import com.example.store.dto.OrderProductDTO;
 import com.example.store.dto.OrderRequestDTO;
 import com.example.store.entity.Customer;
 import com.example.store.entity.Order;
+import com.example.store.entity.Product;
 import com.example.store.error.CustomerNotFoundException;
 import com.example.store.error.OrderNotFoundException;
+import com.example.store.error.ProductNotFoundException;
 import com.example.store.mapper.OrderMapper;
 import com.example.store.repository.CustomerRepository;
 import com.example.store.repository.OrderRepository;
+import com.example.store.repository.ProductRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,6 +46,9 @@ class OrderServiceTests {
     private CustomerRepository customerRepository;
 
     @Mock
+    private ProductRepository productRepository;
+
+    @Mock
     private OrderMapper orderMapper;
 
     @InjectMocks
@@ -47,6 +57,7 @@ class OrderServiceTests {
     private OrderRequestDTO orderRequestDTO;
     private Customer customer;
     private Order savedOrder;
+    private Product product;
     private OrderDTO orderDTO;
 
     @BeforeEach
@@ -54,10 +65,15 @@ class OrderServiceTests {
         orderRequestDTO = new OrderRequestDTO();
         orderRequestDTO.setDescription("Test Order");
         orderRequestDTO.setCustomerId(1L);
+        orderRequestDTO.setProductIds(List.of(100L));
 
         customer = new Customer();
         customer.setId(1L);
         customer.setName("John Doe");
+
+        product = new Product();
+        product.setId(100L);
+        product.setDescription("Test Product");
 
         savedOrder = new Order();
         savedOrder.setId(10L);
@@ -72,11 +88,16 @@ class OrderServiceTests {
         orderDTO.setId(savedOrder.getId());
         orderDTO.setDescription(savedOrder.getDescription());
         orderDTO.setCustomer(orderCustomerDTO);
+        OrderProductDTO orderProductDTO = new OrderProductDTO();
+        orderProductDTO.setId(product.getId());
+        orderProductDTO.setDescription(product.getDescription());
+        orderDTO.setProducts(List.of(orderProductDTO));
     }
 
     @Test
     void createOrderSavesOrderWhenCustomerExists() {
         when(customerRepository.findById(orderRequestDTO.getCustomerId())).thenReturn(Optional.of(customer));
+        when(productRepository.findAllById(orderRequestDTO.getProductIds())).thenReturn(List.of(product));
         when(orderRepository.save(any(Order.class))).thenReturn(savedOrder);
         when(orderMapper.orderToOrderDTO(savedOrder)).thenReturn(orderDTO);
 
@@ -88,6 +109,7 @@ class OrderServiceTests {
         Order orderToSave = orderCaptor.getValue();
         assertEquals("Test Order", orderToSave.getDescription());
         assertSame(customer, orderToSave.getCustomer());
+        assertEquals(List.of(product), orderToSave.getProducts());
         assertSame(orderDTO, result);
     }
 
@@ -104,16 +126,44 @@ class OrderServiceTests {
     }
 
     @Test
+    void createOrderThrowsWhenProductDoesNotExist() {
+        when(customerRepository.findById(orderRequestDTO.getCustomerId())).thenReturn(Optional.of(customer));
+        when(productRepository.findAllById(orderRequestDTO.getProductIds())).thenReturn(List.of());
+
+        ProductNotFoundException exception = assertThrows(
+                ProductNotFoundException.class,
+                () -> orderService.createOrder(orderRequestDTO));
+
+        assertEquals("One or more products could not be found.", exception.getMessage());
+        verify(orderRepository, never()).save(any(Order.class));
+    }
+
+    @Test
+    void createOrderThrowsWhenDuplicateProductIdsAreProvided() {
+        orderRequestDTO.setProductIds(List.of(100L, 100L));
+
+        when(customerRepository.findById(orderRequestDTO.getCustomerId())).thenReturn(Optional.of(customer));
+
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> orderService.createOrder(orderRequestDTO));
+
+        assertEquals("Duplicate product IDs are not allowed.", exception.getMessage());
+        verify(productRepository, never()).findAllById(orderRequestDTO.getProductIds());
+    }
+
+    @Test
     void getAllOrdersReturnsMappedOrders() {
         List<Order> orders = List.of(savedOrder);
-        List<OrderDTO> orderDTOs = List.of(orderDTO);
+        Page<Order> orderPage = new PageImpl<>(orders);
+        PageRequest pageRequest = PageRequest.of(0, 50);
 
-        when(orderRepository.findAll()).thenReturn(orders);
-        when(orderMapper.ordersToOrderDTOs(orders)).thenReturn(orderDTOs);
+        when(orderRepository.findAll(pageRequest)).thenReturn(orderPage);
+        when(orderMapper.orderToOrderDTO(savedOrder)).thenReturn(orderDTO);
 
-        List<OrderDTO> result = orderService.getAllOrders();
+        Page<OrderDTO> result = orderService.getAllOrders(pageRequest);
 
-        assertSame(orderDTOs, result);
+        assertEquals(List.of(orderDTO), result.getContent());
     }
 
     @Test

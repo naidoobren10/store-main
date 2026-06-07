@@ -34,6 +34,7 @@ spotless {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.5'
     runtimeOnly 'org.postgresql:postgresql'
     implementation 'org.liquibase:liquibase-core'
     compileOnly 'org.projectlombok:lombok'
@@ -55,6 +56,32 @@ dependencies {
 
 
 
+}
+
+tasks.named('processResources') {
+    from('.') {
+        include 'OpenAPI.yaml'
+        into 'static'
+    }
+}
+
+tasks.named('bootBuildImage') {
+    imageName = System.getenv('IMAGE_NAME') ?: "ghcr.io/${project.name}:${project.version}"
+
+    def latestTag = System.getenv('IMAGE_LATEST_TAG')
+    if (latestTag) {
+        tags = [latestTag]
+    }
+
+    publish = System.getenv('REGISTRY_USERNAME') != null && System.getenv('REGISTRY_PASSWORD') != null
+
+    docker {
+        publishRegistry {
+            url = 'ghcr.io'
+            username = System.getenv('REGISTRY_USERNAME')
+            password = System.getenv('REGISTRY_PASSWORD')
+        }
+    }
 }
 
 tasks.named('test') {
