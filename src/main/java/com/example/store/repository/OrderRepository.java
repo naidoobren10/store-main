@@ -13,18 +13,14 @@ import java.util.Optional;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
     @Override
-    @NonNull
-    @EntityGraph(attributePaths = {"customer", "products"})
+    @NonNull @EntityGraph(attributePaths = {"customer", "products"})
     List<Order> findAll();
 
     @Override
-    @NonNull
-    @EntityGraph(attributePaths = "customer")
+    @NonNull @EntityGraph(attributePaths = "customer")
     Page<Order> findAll(@NonNull Pageable pageable);
 
     @Override
-    @NonNull
-    @EntityGraph(attributePaths = {"customer", "products"})
+    @NonNull @EntityGraph(attributePaths = {"customer", "products"})
     Optional<Order> findById(@NonNull Long id);
-
 }

@@ -4,6 +4,7 @@ import com.example.store.dto.CreateCustomerRequestDTO;
 import com.example.store.dto.CustomerDTO;
 import com.example.store.service.CustomerService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +49,7 @@ class CustomerControllerTests {
         createCustomerRequestDTO.setName("John Doe");
     }
 
-   @Test
+    @Test
     void testCreateCustomer() throws Exception {
         when(customerService.createCustomer(createCustomerRequestDTO)).thenReturn(customerDTO);
 
@@ -90,7 +91,7 @@ class CustomerControllerTests {
     }
 
     @Test
-    void  testGetAllCustomers() throws Exception {
+    void testGetAllCustomers() throws Exception {
         when(customerService.findCustomers(null)).thenReturn(List.of(customerDTO));
 
         mockMvc.perform(get("/customer"))

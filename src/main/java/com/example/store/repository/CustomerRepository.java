@@ -10,12 +10,10 @@ import org.springframework.lang.NonNull;
 
 import java.util.List;
 
-
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
     @Override
-    @NonNull
-    @EntityGraph(attributePaths = "orders")
+    @NonNull @EntityGraph(attributePaths = "orders")
     List<Customer> findAll();
 
     @Query(value = """

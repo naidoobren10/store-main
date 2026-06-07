@@ -2,7 +2,6 @@ package com.example.store.entity;
 
 import jakarta.persistence.*;
 
-
 import lombok.Getter;
 import lombok.Setter;
 

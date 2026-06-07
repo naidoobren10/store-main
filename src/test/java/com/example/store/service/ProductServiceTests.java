@@ -6,6 +6,7 @@ import com.example.store.entity.Product;
 import com.example.store.error.ProductNotFoundException;
 import com.example.store.mapper.ProductMapper;
 import com.example.store.repository.ProductRepository;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -97,9 +98,8 @@ class ProductServiceTests {
     void getProductByIdThrowsWhenProductDoesNotExist() {
         when(productRepository.findById(1L)).thenReturn(Optional.empty());
 
-        ProductNotFoundException exception = assertThrows(
-                ProductNotFoundException.class,
-                () -> productService.getProductById(1L));
+        ProductNotFoundException exception =
+                assertThrows(ProductNotFoundException.class, () -> productService.getProductById(1L));
 
         assertEquals("Product not found: 1", exception.getMessage());
         verify(productRepository).findById(1L);

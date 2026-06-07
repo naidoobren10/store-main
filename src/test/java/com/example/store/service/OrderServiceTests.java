@@ -14,9 +14,7 @@ import com.example.store.mapper.OrderMapper;
 import com.example.store.repository.CustomerRepository;
 import com.example.store.repository.OrderRepository;
 import com.example.store.repository.ProductRepository;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,6 +22,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 import java.util.Optional;
@@ -117,9 +118,8 @@ class OrderServiceTests {
     void createOrderThrowsWhenCustomerDoesNotExist() {
         when(customerRepository.findById(orderRequestDTO.getCustomerId())).thenReturn(Optional.empty());
 
-        CustomerNotFoundException exception = assertThrows(
-                CustomerNotFoundException.class,
-                () -> orderService.createOrder(orderRequestDTO));
+        CustomerNotFoundException exception =
+                assertThrows(CustomerNotFoundException.class, () -> orderService.createOrder(orderRequestDTO));
 
         assertEquals("Customer not found: 1", exception.getMessage());
         verify(orderRepository, never()).save(any(Order.class));
@@ -130,9 +130,8 @@ class OrderServiceTests {
         when(customerRepository.findById(orderRequestDTO.getCustomerId())).thenReturn(Optional.of(customer));
         when(productRepository.findAllById(orderRequestDTO.getProductIds())).thenReturn(List.of());
 
-        ProductNotFoundException exception = assertThrows(
-                ProductNotFoundException.class,
-                () -> orderService.createOrder(orderRequestDTO));
+        ProductNotFoundException exception =
+                assertThrows(ProductNotFoundException.class, () -> orderService.createOrder(orderRequestDTO));
 
         assertEquals("One or more products could not be found.", exception.getMessage());
         verify(orderRepository, never()).save(any(Order.class));
@@ -144,9 +143,8 @@ class OrderServiceTests {
 
         when(customerRepository.findById(orderRequestDTO.getCustomerId())).thenReturn(Optional.of(customer));
 
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
-                () -> orderService.createOrder(orderRequestDTO));
+        IllegalArgumentException exception =
+                assertThrows(IllegalArgumentException.class, () -> orderService.createOrder(orderRequestDTO));
 
         assertEquals("Duplicate product IDs are not allowed.", exception.getMessage());
         verify(productRepository, never()).findAllById(orderRequestDTO.getProductIds());
@@ -181,9 +179,8 @@ class OrderServiceTests {
     void getOrderByIdThrowsWhenOrderDoesNotExist() {
         when(orderRepository.findById(1L)).thenReturn(Optional.empty());
 
-        OrderNotFoundException exception = assertThrows(
-                OrderNotFoundException.class,
-                () -> orderService.getOrderByID(1L));
+        OrderNotFoundException exception =
+                assertThrows(OrderNotFoundException.class, () -> orderService.getOrderByID(1L));
 
         assertEquals("Order not found: 1", exception.getMessage());
         verify(orderRepository).findById(1L);

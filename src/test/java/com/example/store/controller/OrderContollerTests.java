@@ -10,6 +10,7 @@ import com.example.store.error.OrderNotFoundException;
 import com.example.store.error.ProductNotFoundException;
 import com.example.store.service.OrderService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,12 +69,10 @@ class OrderControllerTests {
         orderProductDTO.setId(100L);
         orderProductDTO.setDescription("Test Product");
         orderDTO.setProducts(List.of(orderProductDTO));
-
     }
 
     @Test
     void testCreateOrder() throws Exception {
-
 
         when(orderService.createOrder(any(OrderRequestDTO.class))).thenReturn(orderDTO);
 
@@ -186,7 +185,7 @@ class OrderControllerTests {
                 .andExpect(jsonPath("$.content[0].products[0].description").value("Test Product"));
     }
 
-   @Test
+    @Test
     void testGetOrderById() throws Exception {
         when(orderService.getOrderByID(1L)).thenReturn(orderDTO);
 
