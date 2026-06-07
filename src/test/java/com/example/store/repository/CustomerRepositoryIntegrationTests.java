@@ -1,6 +1,7 @@
 package com.example.store.repository;
 
 import com.example.store.entity.Customer;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
-@Testcontainers
+@Testcontainers(disabledWithoutDocker = true)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class CustomerRepositoryIntegrationTests {
 
@@ -59,29 +60,34 @@ class CustomerRepositoryIntegrationTests {
 
     @Test
     void findByNameContainingQueryStringMatchesOrderedWordPrefixes() {
-        List<Customer> results = customerRepository.findByNameContainingQueryString(
-                "^jo[^[:space:]]*\\s+d[^[:space:]]*(\\s+.*)?$");
+        List<Customer> results =
+                customerRepository.findByNameContainingQueryString("^jo[^[:space:]]*\\s+d[^[:space:]]*(\\s+.*)?$");
 
-        assertEquals(List.of("Joe Doe", "John Deer"), results.stream().map(Customer::getName).sorted().toList());
+        assertEquals(
+                List.of("Joe Doe", "John Deer"),
+                results.stream().map(Customer::getName).sorted().toList());
     }
 
     @Test
     void findByNameContainingQueryStringReturnsEmptyListWhenNothingMatches() {
-        List<Customer> results = customerRepository.findByNameContainingQueryString(
-                "^xx[^[:space:]]*(\\s+.*)?$");
+        List<Customer> results = customerRepository.findByNameContainingQueryString("^xx[^[:space:]]*(\\s+.*)?$");
 
         assertTrue(results.isEmpty());
     }
 
     @Test
     void findByNameContainingQueryStringSupportsPunctuationInsideNameWords() {
-        List<Customer> hyphenResults = customerRepository.findByNameContainingQueryString(
-                "^anne-m[^[:space:]]*(\\s+.*)?$");
-        List<Customer> apostropheResults = customerRepository.findByNameContainingQueryString(
-                "^o'c[^[:space:]]*(\\s+.*)?$");
+        List<Customer> hyphenResults =
+                customerRepository.findByNameContainingQueryString("^anne-m[^[:space:]]*(\\s+.*)?$");
+        List<Customer> apostropheResults =
+                customerRepository.findByNameContainingQueryString("^o'c[^[:space:]]*(\\s+.*)?$");
 
-        assertEquals(List.of("Anne-Marie Jones"), hyphenResults.stream().map(Customer::getName).toList());
-        assertEquals(List.of("O'Connor Shaun"), apostropheResults.stream().map(Customer::getName).toList());
+        assertEquals(
+                List.of("Anne-Marie Jones"),
+                hyphenResults.stream().map(Customer::getName).toList());
+        assertEquals(
+                List.of("O'Connor Shaun"),
+                apostropheResults.stream().map(Customer::getName).toList());
     }
 
     private static Customer customer(String name) {

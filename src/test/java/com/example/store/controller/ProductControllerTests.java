@@ -5,6 +5,7 @@ import com.example.store.dto.ProductDTO;
 import com.example.store.error.ProductNotFoundException;
 import com.example.store.service.ProductService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,7 +81,6 @@ class ProductControllerTests {
                 .andExpect(jsonPath("$.title").value("Validation failed"))
                 .andExpect(jsonPath("$.detail").value("One or more request fields are invalid."));
     }
-
 
     @Test
     void getAllProducts() throws Exception {

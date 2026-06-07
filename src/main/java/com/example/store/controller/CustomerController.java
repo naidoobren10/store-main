@@ -3,7 +3,9 @@ package com.example.store.controller;
 import com.example.store.dto.CreateCustomerRequestDTO;
 import com.example.store.dto.CustomerDTO;
 import com.example.store.service.CustomerService;
+
 import jakarta.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -25,9 +27,7 @@ public class CustomerController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CustomerDTO>> getAllCustomers(
-            @RequestParam(required = false) String queryString
-    ) {
+    public ResponseEntity<List<CustomerDTO>> getAllCustomers(@RequestParam(required = false) String queryString) {
         log.info("Received customer search request with queryString='{}'", queryString);
         List<CustomerDTO> customerDTOList = customerService.findCustomers(queryString);
         log.info("Returning {} customers for queryString='{}'", customerDTOList.size(), queryString);
@@ -40,6 +40,5 @@ public class CustomerController {
         CustomerDTO customerDTO = customerService.createCustomer(request);
         log.info("Returning created customer with id={}", customerDTO.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(customerDTO);
-
     }
 }

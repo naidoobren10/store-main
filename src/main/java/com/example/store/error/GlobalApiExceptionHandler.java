@@ -1,6 +1,5 @@
 package com.example.store.error;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalApiExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalApiExceptionHandler.class);
-
 
     @ExceptionHandler(IllegalArgumentException.class)
     ProblemDetail handleIllegalArgument(IllegalArgumentException exception) {
@@ -85,9 +83,10 @@ public class GlobalApiExceptionHandler {
         log.warn("Product not found: {}", exception.getMessage());
         ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
         problemDetail.setTitle("Product not found");
-        problemDetail.setDetail("One or more products could not be found.".equals(exception.getMessage())
-                ? exception.getMessage()
-                : "The product could not be found.");
+        problemDetail.setDetail(
+                "One or more products could not be found.".equals(exception.getMessage())
+                        ? exception.getMessage()
+                        : "The product could not be found.");
         return problemDetail;
     }
 }

@@ -6,6 +6,7 @@ import com.example.store.entity.Product;
 import com.example.store.error.ProductNotFoundException;
 import com.example.store.mapper.ProductMapper;
 import com.example.store.repository.ProductRepository;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -46,13 +47,12 @@ public class ProductService {
     @Transactional(readOnly = true)
     public ProductDTO getProductById(Long id) {
         log.info("Fetching product by id={}", id);
-        ProductDTO productDTO = productMapper.productToProductDTO(productRepository.findById(id)
-                .orElseThrow(() -> {
+        ProductDTO productDTO =
+                productMapper.productToProductDTO(productRepository.findById(id).orElseThrow(() -> {
                     log.warn("Product not found for id={}", id);
                     return new ProductNotFoundException("Product not found: " + id);
                 }));
         log.info("Fetched product id={}", productDTO.getId());
         return productDTO;
     }
-
 }

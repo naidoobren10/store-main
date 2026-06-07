@@ -12,6 +12,7 @@ import com.example.store.mapper.OrderMapper;
 import com.example.store.repository.CustomerRepository;
 import com.example.store.repository.OrderRepository;
 import com.example.store.repository.ProductRepository;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -63,11 +64,10 @@ public class OrderService {
         Order order = new Order();
         order.setDescription(request.getDescription());
 
-        Customer customer = customerRepository.findById(request.getCustomerId())
-                .orElseThrow(() -> {
-                    log.warn("Customer not found for order creation: customerId={}", request.getCustomerId());
-                    return new CustomerNotFoundException("Customer not found: " + request.getCustomerId());
-                });
+        Customer customer = customerRepository.findById(request.getCustomerId()).orElseThrow(() -> {
+            log.warn("Customer not found for order creation: customerId={}", request.getCustomerId());
+            return new CustomerNotFoundException("Customer not found: " + request.getCustomerId());
+        });
         List<Long> productIds = request.getProductIds();
 
         long distinctCount = productIds.stream().distinct().count();
@@ -78,7 +78,10 @@ public class OrderService {
 
         List<Product> products = productRepository.findAllById(productIds);
         if (products.size() != productIds.size()) {
-            log.warn("Product lookup mismatch for order creation: requested={} found={}", productIds.size(), products.size());
+            log.warn(
+                    "Product lookup mismatch for order creation: requested={} found={}",
+                    productIds.size(),
+                    products.size());
             throw new ProductNotFoundException("One or more products could not be found.");
         }
 
@@ -93,9 +96,8 @@ public class OrderService {
     @Transactional(readOnly = true)
     public OrderDTO getOrderByID(Long id) {
         log.info("Fetching order by id={}", id);
-        OrderDTO orderDTO = orderMapper.orderToOrderDTO(orderRepository
-                .findById(id)
-                .orElseThrow(() -> {
+        OrderDTO orderDTO =
+                orderMapper.orderToOrderDTO(orderRepository.findById(id).orElseThrow(() -> {
                     log.warn("Order not found for id={}", id);
                     return new OrderNotFoundException("Order not found: " + id);
                 }));

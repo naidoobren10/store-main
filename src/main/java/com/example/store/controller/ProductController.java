@@ -3,7 +3,9 @@ package com.example.store.controller;
 import com.example.store.dto.CreateProductRequestDTO;
 import com.example.store.dto.ProductDTO;
 import com.example.store.service.ProductService;
+
 import jakarta.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -52,5 +54,4 @@ public class ProductController {
         log.info("Returning product with id={}", productDTO.getId());
         return ResponseEntity.status(HttpStatus.OK).body(productDTO);
     }
-
 }
